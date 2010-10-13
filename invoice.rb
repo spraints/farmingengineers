@@ -1,5 +1,5 @@
-#require 'rubygems' ; require 'bundler/setup'
-#require 'ruport'
+require 'rubygems' ; require 'bundler/setup'
+require 'ruport'
 require 'forwardable'
 
 module InstanceEvalAttr
@@ -17,20 +17,68 @@ module InstanceEvalAttr
   end
 end
 
+class InvoiceController < Ruport::Controller
+  stage :history
+
+  def setup
+    history_table = Table(:date, :description, :quantity, :total, :balance) do |t|
+      balance = 0
+      options[:invoice].history.each do |line|
+        balance += line.total
+        t << [line.date, line.description, line.quantity, line.total, balance]
+      end
+    end
+    history_table.rename_columns(
+      :date => 'Date',
+      :description => 'Description',
+      :quantity => 'Quantity',
+      :total => 'Total',
+      :balance => 'Balance'
+    )
+    self.data = history_table
+  end
+end
+
+class PdfInvoice < Ruport::Formatter::PDF
+  renders :pdf, :for => InvoiceController
+  build :history do
+    draw_table data, :width => 450
+  end
+end
+
+class TextInvoice < Ruport::Formatter::Text
+  renders :text, :for => InvoiceController
+  build :history do
+    render_table data
+  end
+end
+
 module FarmingEngineers
   module Invoices
+    class HistoryItem
+      attr_reader :date, :description, :quantity, :total
+    end
+    class Deposit < HistoryItem
+      def initialize(date, amount)
+        @date = date
+        @description = 'Deposit'
+        @total = -amount
+      end
+    end
     class Eggs
       extend InstanceEvalAttr
       instance_eval_attr :customer, :address
 
       extend Forwardable
-      def_delegators :@activities, :deposit, :deliver
+      def_delegators :@history, :deposit, :deliver
+
+      attr_reader :history
 
       def initialize
-        @activities = Activities.new
+        @history = EggHistory.new
       end
 
-      class Activities < Array
+      class EggHistory < Array
         def deposit date, amount
           push Deposit.new(date, amount)
         end
@@ -39,17 +87,21 @@ module FarmingEngineers
         end
       end
 
-      class Delivery
+      class Delivery < FarmingEngineers::Invoices::HistoryItem
         def initialize(date, dozens)
           @date = date
-          @dozens = dozens
+          @description = 'Delivery'
+          @quantity = dozens
         end
-      end
-    end
-    class Deposit
-      def initialize(date, amount)
-        @date   = date
-        @amount = amount
+        def total
+          if @quantity < 8
+            @quantity * 5
+          elsif @quantity < 12
+            @quantity * 4.50
+          else
+            @quantity * 4
+          end
+        end
       end
     end
   end
@@ -68,3 +120,6 @@ invoice = egg_csa_invoice do
 end
 
 puts invoice.inspect
+puts InvoiceController.render(:text, :invoice => invoice)
+InvoiceController.render(:pdf, :invoice => invoice, :file => 'invoice.pdf')
+system 'open invoice.pdf'

@@ -1,16 +1,26 @@
 GEM
   remote: http://rubygems.org/
   specs:
-    prawn (0.8.4)
-      prawn-core (>= 0.8.4, < 0.9)
-      prawn-layout (>= 0.8.4, < 0.9)
-      prawn-security (>= 0.8.4, < 0.9)
-    prawn-core (0.8.4)
-    prawn-layout (0.8.4)
-    prawn-security (0.8.4)
+    color (1.4.1)
+    fastercsv (1.5.3)
+    hoe (2.6.2)
+      rake (>= 0.8.7)
+      rubyforge (>= 2.0.4)
+    json_pure (1.4.6)
+    pdf-writer (1.1.8)
+      color (>= 1.4.0)
+      transaction-simple (~> 1.3)
+    rake (0.8.7)
+    rubyforge (2.0.4)
+      json_pure (>= 1.1.7)
+    ruport (1.6.3)
+      fastercsv
+      pdf-writer (= 1.1.8)
+    transaction-simple (1.4.0)
+      hoe (>= 1.1.7)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
-  prawn
+  ruport
