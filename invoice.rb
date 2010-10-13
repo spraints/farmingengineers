@@ -1,5 +1,6 @@
 require 'rubygems' ; require 'bundler/setup'
 require 'ruport'
+require 'ruport/util'
 require 'forwardable'
 
 module InstanceEvalAttr
@@ -14,42 +15,6 @@ module InstanceEvalAttr
         instance_variable_set(varname, val)
       end
     end
-  end
-end
-
-class InvoiceController < Ruport::Controller
-  stage :history
-
-  def setup
-    history_table = Table(:date, :description, :quantity, :total, :balance) do |t|
-      balance = 0
-      options[:invoice].history.each do |line|
-        balance += line.total
-        t << [line.date, line.description, line.quantity, line.total, balance]
-      end
-    end
-    history_table.rename_columns(
-      :date => 'Date',
-      :description => 'Description',
-      :quantity => 'Quantity',
-      :total => 'Total',
-      :balance => 'Balance'
-    )
-    self.data = history_table
-  end
-end
-
-class PdfInvoice < Ruport::Formatter::PDF
-  renders :pdf, :for => InvoiceController
-  build :history do
-    draw_table data, :width => 450
-  end
-end
-
-class TextInvoice < Ruport::Formatter::Text
-  renders :text, :for => InvoiceController
-  build :history do
-    render_table data
   end
 end
 
@@ -119,7 +84,32 @@ invoice = egg_csa_invoice do
   deliver  '10/11/2010', 4
 end
 
-puts invoice.inspect
-puts InvoiceController.render(:text, :invoice => invoice)
-InvoiceController.render(:pdf, :invoice => invoice, :file => 'invoice.pdf')
+history_table = Table(:date, :description, :quantity, :total, :balance) do |t|
+  balance = 0
+  invoice.history.each do |line|
+    balance += line.total
+    t << [line.date, line.description, line.quantity, line.total, balance]
+  end
+end
+history_table.rename_columns(
+  :date => 'Date',
+  :description => 'Description',
+  :quantity => 'Quantity',
+  :total => 'Total',
+  :balance => 'Balance'
+)
+puts history_table
+Ruport::Controller::Invoice.render :pdf, :file => 'invoice.pdf' do |i|
+  i.data = history_table
+  i.options do |o|
+    o.company_info  = "the farming engineers\nPO Box 1031\nWestfield, IN 46074"
+    o.customer_info = "#{invoice.customer}\n#{invoice.address.join("\n")}"
+    o.comments      = "{invoice.notes}"
+    o.order_info    = "Some info\nabout your order"
+    o.title         = "Egg delivery"
+    o.body_width = 480
+    o.comments_font_size = 12
+    o.title_font_size = 10  
+  end
+end
 system 'open invoice.pdf'

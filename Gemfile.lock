@@ -7,15 +7,23 @@ GEM
       rake (>= 0.8.7)
       rubyforge (>= 2.0.4)
     json_pure (1.4.6)
+    mailfactory (1.4.0)
+      mime-types (>= 1.13.1)
+    mime-types (1.16)
     pdf-writer (1.1.8)
       color (>= 1.4.0)
       transaction-simple (~> 1.3)
     rake (0.8.7)
     rubyforge (2.0.4)
       json_pure (>= 1.1.7)
+    rubyzip (0.9.4)
     ruport (1.6.3)
       fastercsv
       pdf-writer (= 1.1.8)
+    ruport-util (0.14.0)
+      mailfactory (>= 1.2.3)
+      rubyzip (>= 0.9.1)
+      ruport (>= 1.6.0)
     transaction-simple (1.4.0)
       hoe (>= 1.1.7)
 
@@ -24,3 +32,4 @@ PLATFORMS
 
 DEPENDENCIES
   ruport
+  ruport-util
