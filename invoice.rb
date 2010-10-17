@@ -8,4 +8,6 @@ egg_csa_invoice do
   address  ['123 Street', 'City, IN', '317-xxx-xxxx']
   deposit    '8/1/2010', 50
   deliver  '10/11/2010', 4
+  purchase '11/1/2010', 'Doughnuts', 10
+  notes 'Notes to customer'
 end
