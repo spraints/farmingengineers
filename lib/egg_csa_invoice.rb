@@ -26,7 +26,8 @@ def egg_csa_invoice(&block)
   )
 
   invoice_id = "#{Date.today.strftime('%Y%m%d')}-#{$invoice_count += 1}"
-  invoice_file = "invoice-#{invoice_id}.pdf"
+  invoice_file = File.expand_path("../invoice-#{invoice_id}.pdf", $0)
+  puts invoice_file
 
   Ruport::Controller::Invoice.render :pdf, :file => invoice_file do |i|
     i.data = history_table
