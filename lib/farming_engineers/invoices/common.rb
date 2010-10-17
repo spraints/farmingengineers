@@ -16,6 +16,10 @@ module FarmingEngineers ; module Invoices ; module Common
     def deposit date, amount
       push Deposit.new(date, amount)
     end
+
+    def purchase date, description, amount
+      push Purchase.new(date, description, amount)
+    end
   end
   class HistoryItem
     attr_reader :date, :description, :quantity, :total
@@ -25,6 +29,13 @@ module FarmingEngineers ; module Invoices ; module Common
       @date = date
       @description = 'Deposit'
       @total = -amount
+    end
+  end
+  class Purchase < HistoryItem
+    def initialize(date, description, amount)
+      @date = date
+      @description = description
+      @total = amount
     end
   end
 end ; end ; end
