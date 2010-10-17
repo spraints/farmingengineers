@@ -2,6 +2,8 @@ require 'ruport'
 require 'ruport/util'
 require 'farming_engineers'
 
+module EggCsaInvoice
+
 $invoice_count = 0
 def egg_csa_invoice(&block)
   invoice = FarmingEngineers::Invoices::Eggs::Invoice.new
@@ -11,7 +13,7 @@ def egg_csa_invoice(&block)
     balance = 0
     invoice.history.each do |line|
       balance += line.total
-      t << [line.date, line.description, line.quantity, line.total, balance]
+      t << [line.date, line.description, line.quantity, d(line.total), d(balance)]
     end
   end
 
@@ -39,4 +41,14 @@ def egg_csa_invoice(&block)
       o.title_font_size = 10  
     end
   end
+end
+def d(amount)
+  '$%0.2f' % amount
+end
+
+extend self
+end
+
+def egg_csa_invoice(&block)
+  EggCsaInvoice.egg_csa_invoice(&block)
 end
