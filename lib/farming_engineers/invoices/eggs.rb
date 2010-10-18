@@ -7,25 +7,29 @@ module FarmingEngineers ; module Invoices ; module Eggs
   end
 
   class History < Common::History
-    def deliver date, dozens
-      push Delivery.new(date, dozens)
+    def deliver date, dozens, opts = {}
+      push Delivery.new(date, dozens, opts)
     end
   end
 
   class Delivery < Common::HistoryItem
-    def initialize(date, dozens)
+    def initialize(date, dozens, opts = {})
       @date = date
       @description = 'Delivery'
       @quantity = dozens
+      @total = calculate opts.merge(:dozens => dozens)
     end
-    def total
-      if @quantity < 8
-        @quantity * 5
-      elsif @quantity < 12
-        @quantity * 4.50
-      else
-        @quantity * 4
-      end
+    private
+    def calculate opts
+      opts[:total] ||
+        opts[:dozens] * (opts[:rate] || opts[:price] ||
+          if opts[:dozens] < 8
+            5
+          elsif opts[:dozens] < 12
+            4.50
+          else
+            4
+          end)
     end
   end
 end ; end ; end
