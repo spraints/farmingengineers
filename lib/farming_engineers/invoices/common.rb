@@ -15,6 +15,20 @@ module FarmingEngineers ; module Invoices ; module Common
   class HistoryItem
     attr_reader :date, :description, :quantity, :total
   end
+  class LineItem < HistoryItem
+    def initialize(*args)
+      case args.first
+      when Hash
+        args = args.first
+        @date = args[:date]
+        @description = args[:description]
+        @quantity = args[:quantity]
+        @total = args[:total]
+      else
+        @date, @description, @quantity, @total = args
+      end
+    end
+  end
   class Deposit < HistoryItem
     def initialize(date, amount)
       @date = date
@@ -37,5 +51,7 @@ module FarmingEngineers ; module Invoices ; module Common
     end
     generator :deposit, Deposit
     generator :purchase, Purchase
+    generator :line, LineItem
+    generator :line_item, LineItem
   end
 end ; end ; end
