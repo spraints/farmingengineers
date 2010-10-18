@@ -10,6 +10,9 @@ module FarmingEngineers ; module Invoices ; module Eggs
     def deliver date, dozens, opts = {}
       push Delivery.new(date, dozens, opts)
     end
+    alias delivery deliver
+    alias egg_delivery deliver
+    def egg(*args) ; end
   end
 
   class Delivery < Common::HistoryItem
