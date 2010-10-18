@@ -6,15 +6,6 @@ module FarmingEngineers ; module Invoices ; module Eggs
     end
   end
 
-  class History < Common::History
-    def deliver date, dozens, opts = {}
-      push Delivery.new(date, dozens, opts)
-    end
-    alias delivery deliver
-    alias egg_delivery deliver
-    def egg(*args) ; end
-  end
-
   class Delivery < Common::HistoryItem
     def initialize(date, dozens, opts = {})
       @date = date
@@ -34,5 +25,12 @@ module FarmingEngineers ; module Invoices ; module Eggs
             4
           end)
     end
+  end
+
+  class History < Common::History
+    generator :deliver, Delivery
+    generator :delivery, Delivery
+    generator :egg_delivery, Delivery
+    def egg(*args) ; end
   end
 end ; end ; end

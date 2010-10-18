@@ -12,15 +12,6 @@ module FarmingEngineers ; module Invoices ; module Common
     end
   end
 
-  class History < Array
-    def deposit date, amount
-      push Deposit.new(date, amount)
-    end
-
-    def purchase date, description, amount
-      push Purchase.new(date, description, amount)
-    end
-  end
   class HistoryItem
     attr_reader :date, :description, :quantity, :total
   end
@@ -37,5 +28,14 @@ module FarmingEngineers ; module Invoices ; module Common
       @description = description
       @total = amount
     end
+  end
+  class History < Array
+    def self.generator(name, klass)
+      define_method(name) do |*args|
+        push klass.new(*args)
+      end
+    end
+    generator :deposit, Deposit
+    generator :purchase, Purchase
   end
 end ; end ; end
