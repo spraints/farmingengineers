@@ -18,7 +18,7 @@ module FarmingEngineers ; module Invoices ; module Eggs
   class Delivery < Common::HistoryItem
     def initialize(date, dozens, opts = {})
       @date = date
-      @description = 'Delivery'
+      @description = 'Egg Delivery'
       @quantity = dozens
       @total = calculate opts.merge(:dozens => dozens)
     end
