@@ -5,7 +5,7 @@ require 'farming_engineers'
 module EggCsaInvoice
 
 $invoice_count = 0
-def egg_csa_invoice(&block)
+def egg_csa_invoice(opts = {}, &block)
   invoice = FarmingEngineers::Invoices::Eggs::Invoice.new
   invoice.instance_eval(&block)
 
@@ -26,8 +26,8 @@ def egg_csa_invoice(&block)
     :balance => 'Balance'
   )
 
-  invoice_id = "#{Date.today.strftime('%Y%m%d')}-#{$invoice_count += 1}"
-  invoice_file = File.expand_path("../invoice-#{invoice_id}.pdf", $0)
+  invoice_id = opts[:id] || "#{Date.today.strftime('%Y%m%d')}-#{$invoice_count += 1}"
+  invoice_file = invoice_id + '.pdf'
   puts invoice_file
 
   Ruport::Controller::Invoice.render :pdf, :file => invoice_file do |i|
@@ -51,6 +51,6 @@ end
 extend self
 end
 
-def egg_csa_invoice(&block)
-  EggCsaInvoice.egg_csa_invoice(&block)
+def egg_csa_invoice(*args, &block)
+  EggCsaInvoice.egg_csa_invoice(*args, &block)
 end
