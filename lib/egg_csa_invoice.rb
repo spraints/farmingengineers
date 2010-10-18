@@ -15,6 +15,7 @@ def egg_csa_invoice(&block)
       balance += line.total
       t << [line.date, line.description, line.quantity, d(line.total), d(balance)]
     end
+    t << ['', '', '', 'TOTAL', d(balance)]
   end
 
   history_table.rename_columns(
